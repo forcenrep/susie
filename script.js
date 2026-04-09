@@ -76,50 +76,178 @@ if (caseTabs.length && casePanels.length) {
   });
 }
 
-const benefitsSlider = document.getElementById('benefits-slider');
-if (benefitsSlider) {
-  const slides = Array.from(benefitsSlider.querySelectorAll('[data-benefit-slide]'));
-  const prevButton = document.getElementById('benefits-prev');
-  const nextButton = document.getElementById('benefits-next');
-  const dotsWrap = document.getElementById('benefits-dots');
-  let currentSlide = 0;
+const videoModal = document.getElementById('video-modal');
+const videoModalTitle = document.getElementById('video-modal-title');
+const videoModalDescription = document.getElementById('video-modal-description');
+const videoModalPlayer = document.getElementById('video-modal-player');
+const videoTriggers = document.querySelectorAll('.video-card-trigger');
 
-  const dots = slides.map((_, index) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'benefits-dot';
-    dot.setAttribute('aria-label', `Слайд ${index + 1}`);
-    dot.addEventListener('click', () => showSlide(index));
-    dotsWrap.appendChild(dot);
-    return dot;
+const courseModal = document.getElementById('course-modal');
+const courseModalTitle = document.getElementById('course-modal-title');
+const courseModalDescription = document.getElementById('course-modal-description');
+const courseModalExamples = document.getElementById('course-modal-examples');
+const courseModalSignup = document.getElementById('course-modal-signup');
+const courseMoreButtons = document.querySelectorAll('.course-more');
+const courseSignupButtons = document.querySelectorAll('.course-signup');
+const selectedCourseInput = document.getElementById('selected-course-input');
+const selectedCourseNote = document.getElementById('selected-course-note');
+const finalCtaSection = document.getElementById('final-cta');
+
+const courseDetails = {
+  'ege-writing': {
+    title: 'ЕГЭ без паники (письменная часть)',
+    description:
+      'Практический мини-курс для уверенной письменной части: структура, логика аргументации, критерии и частые ошибки.',
+    examples: [
+      'Проверка письма и комментарии по критериям.',
+      'Пошаговый алгоритм для эссе и типовых формулировок.',
+      'Разбор удачных и слабых примеров с доработкой.',
+    ],
+  },
+  speaking: {
+    title: 'Устная часть без страха',
+    description:
+      'Курс для развития уверенной речи: тренируем ответы по структуре, темп, уверенную подачу и реакцию на сложные вопросы.',
+    examples: [
+      'Проверка устных ответов и персональная обратная связь.',
+      'Готовые конструкции и речевые связки для разных тем.',
+      'Практика в формате экзамена с корректировкой стратегии.',
+    ],
+  },
+};
+
+let activeCourseName = '';
+
+function syncModalState() {
+  const hasOpenModal =
+    (videoModal && !videoModal.hidden) || (courseModal && !courseModal.hidden);
+  document.body.classList.toggle('modal-open', Boolean(hasOpenModal));
+}
+
+function closeVideoModal() {
+  if (!videoModal) return;
+  videoModal.hidden = true;
+
+  if (videoModalPlayer) {
+    videoModalPlayer.innerHTML =
+      '<div class="video-modal-placeholder">Здесь будет видеоотзыв. Вы сможете добавить ссылку на видео в карточку.</div>';
+  }
+
+  syncModalState();
+}
+
+function openVideoModal(trigger) {
+  if (!videoModal || !videoModalTitle || !videoModalDescription || !videoModalPlayer) return;
+
+  const title = trigger.dataset.videoTitle || 'Видеоотзыв';
+  const description = trigger.dataset.videoDescription || 'Описание видео будет добавлено позже.';
+  const embedUrl = trigger.dataset.videoEmbed;
+
+  videoModalTitle.textContent = title;
+  videoModalDescription.textContent = description;
+
+  if (embedUrl) {
+    videoModalPlayer.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.src = embedUrl;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    iframe.loading = 'lazy';
+    iframe.title = title;
+    videoModalPlayer.appendChild(iframe);
+  } else {
+    videoModalPlayer.innerHTML =
+      '<div class="video-modal-placeholder">Здесь будет видеоотзыв. Вы сможете добавить ссылку на видео в карточку.</div>';
+  }
+
+  videoModal.hidden = false;
+  syncModalState();
+}
+
+function closeCourseModal() {
+  if (!courseModal) return;
+  courseModal.hidden = true;
+  activeCourseName = '';
+  syncModalState();
+}
+
+function openCourseModal(courseId) {
+  if (!courseModal || !courseModalTitle || !courseModalDescription || !courseModalExamples) return;
+
+  const details = courseDetails[courseId];
+  if (!details) return;
+
+  courseModalTitle.textContent = details.title;
+  courseModalDescription.textContent = details.description;
+
+  courseModalExamples.innerHTML = '';
+  details.examples.forEach((example) => {
+    const li = document.createElement('li');
+    li.textContent = example;
+    courseModalExamples.appendChild(li);
   });
 
-  const showSlide = (index) => {
-    if (!slides.length) return;
-    if (index < 0) {
-      currentSlide = slides.length - 1;
-    } else if (index >= slides.length) {
-      currentSlide = 0;
-    } else {
-      currentSlide = index;
-    }
-
-    slides.forEach((slide, slideIndex) => {
-      const isActive = slideIndex === currentSlide;
-      slide.hidden = !isActive;
-      slide.classList.toggle('is-active', isActive);
-    });
-
-    dots.forEach((dot, dotIndex) => {
-      dot.classList.toggle('is-active', dotIndex === currentSlide);
-    });
-  };
-
-  prevButton?.addEventListener('click', () => showSlide(currentSlide - 1));
-  nextButton?.addEventListener('click', () => showSlide(currentSlide + 1));
-
-  showSlide(0);
+  activeCourseName = details.title;
+  courseModal.hidden = false;
+  syncModalState();
 }
+
+function applyCourseSelection(courseName) {
+  if (!courseName) return;
+
+  if (selectedCourseInput) {
+    selectedCourseInput.value = courseName;
+  }
+
+  if (selectedCourseNote) {
+    selectedCourseNote.hidden = false;
+    selectedCourseNote.textContent = `Выбран мини-курс: ${courseName}`;
+  }
+}
+
+function scrollToLeadForm() {
+  if (!finalCtaSection) return;
+  finalCtaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+videoTriggers.forEach((trigger) => {
+  trigger.addEventListener('click', () => openVideoModal(trigger));
+});
+
+document.querySelectorAll('[data-video-close]').forEach((button) => {
+  button.addEventListener('click', closeVideoModal);
+});
+
+courseMoreButtons.forEach((button) => {
+  button.addEventListener('click', () => openCourseModal(button.dataset.courseId));
+});
+
+document.querySelectorAll('[data-course-close]').forEach((button) => {
+  button.addEventListener('click', closeCourseModal);
+});
+
+if (courseModalSignup) {
+  courseModalSignup.addEventListener('click', () => {
+    if (!activeCourseName) return;
+    applyCourseSelection(activeCourseName);
+    closeCourseModal();
+    scrollToLeadForm();
+  });
+}
+
+courseSignupButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const courseName = button.dataset.course || '';
+    applyCourseSelection(courseName);
+    scrollToLeadForm();
+  });
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  closeVideoModal();
+  closeCourseModal();
+});
 
 const testData = {
   'ОГЭ': [
@@ -172,11 +300,11 @@ const testData = {
   'ЕГЭ': [
     {
       category: 'Английский язык',
-      question: 'Выберите корректный вариант: If I ... more time, I would read this text again.',
+      question: 'Какую форму глагола выбирают в условии второго типа после If?',
       options: [
-        { text: 'had', score: 3 },
-        { text: 'have', score: 2 },
-        { text: 'will have', score: 1 },
+        { text: 'Форму прошедшего времени (had)', score: 3 },
+        { text: 'Форму настоящего времени (have)', score: 2 },
+        { text: 'Форму будущего времени (will have)', score: 1 },
       ],
     },
     {
@@ -219,7 +347,7 @@ const testData = {
   'Международный экзамен': [
     {
       category: 'Английский язык',
-      question: 'Что важнее всего в устной части международного экзамена?',
+      question: 'Что важнее всего в устной части Международного экзамена?',
       options: [
         { text: 'Логика ответа и понятная структура речи', score: 3 },
         { text: 'Говорить как можно быстрее', score: 1 },
@@ -400,7 +528,7 @@ function examSpecificTip(exam) {
   if (exam === 'ЕГЭ') {
     return 'Для ЕГЭ ключевой акцент — стратегия по заданиям и стабильная письменная часть.';
   }
-  return 'Для международного экзамена важно держать баланс между структурой ответа и уверенной подачей.';
+  return 'Для Международного экзамена важно держать баланс между структурой ответа и уверенной подачей.';
 }
 
 function showResult() {
