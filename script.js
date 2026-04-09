@@ -76,6 +76,91 @@ if (caseTabs.length && casePanels.length) {
   });
 }
 
+const photoReviewsBlock = document.querySelector('[data-photo-reviews]');
+
+if (photoReviewsBlock) {
+  const photoTrack = photoReviewsBlock.querySelector('.photo-reviews-track');
+  const photoSlides = Array.from(photoReviewsBlock.querySelectorAll('.photo-review-slide'));
+  const prevPhotoButton = photoReviewsBlock.querySelector('[data-photo-prev]');
+  const nextPhotoButton = photoReviewsBlock.querySelector('[data-photo-next]');
+  const photoDots = Array.from(photoReviewsBlock.querySelectorAll('[data-photo-dot]'));
+  let activePhotoIndex = 0;
+
+  const renderPhotoSlide = (index) => {
+    if (!photoTrack || !photoSlides.length) return;
+    activePhotoIndex = (index + photoSlides.length) % photoSlides.length;
+    photoTrack.style.transform = `translateX(-${activePhotoIndex * 100}%)`;
+
+    photoSlides.forEach((slide, slideIndex) => {
+      slide.classList.toggle('is-active', slideIndex === activePhotoIndex);
+    });
+
+    photoDots.forEach((dot, dotIndex) => {
+      const isActive = dotIndex === activePhotoIndex;
+      dot.classList.toggle('is-active', isActive);
+      dot.setAttribute('aria-pressed', String(isActive));
+    });
+  };
+
+  if (photoSlides.length > 1) {
+    prevPhotoButton?.addEventListener('click', () => renderPhotoSlide(activePhotoIndex - 1));
+    nextPhotoButton?.addEventListener('click', () => renderPhotoSlide(activePhotoIndex + 1));
+
+    photoDots.forEach((dot) => {
+      dot.addEventListener('click', () => renderPhotoSlide(Number(dot.dataset.photoDot)));
+    });
+  } else {
+    prevPhotoButton?.setAttribute('disabled', 'true');
+    nextPhotoButton?.setAttribute('disabled', 'true');
+  }
+
+  renderPhotoSlide(0);
+}
+
+const videoReviewsBlock = document.querySelector('[data-video-reviews]');
+
+if (videoReviewsBlock) {
+  const videoTrack = videoReviewsBlock.querySelector('.video-reviews-track');
+  const videoSlides = Array.from(videoReviewsBlock.querySelectorAll('.video-review-slide'));
+  const prevVideoButton = videoReviewsBlock.querySelector('[data-video-prev]');
+  const nextVideoButton = videoReviewsBlock.querySelector('[data-video-next]');
+  const videoDots = Array.from(videoReviewsBlock.querySelectorAll('[data-video-dot]'));
+  let activeVideoIndex = 0;
+
+  const renderVideoSlide = (index) => {
+    if (!videoTrack || !videoSlides.length) return;
+    activeVideoIndex = (index + videoSlides.length) % videoSlides.length;
+    videoTrack.style.transform = `translateX(-${activeVideoIndex * 100}%)`;
+
+    videoSlides.forEach((slide, slideIndex) => {
+      const isActive = slideIndex === activeVideoIndex;
+      slide.classList.toggle('is-active', isActive);
+      const video = slide.querySelector('video');
+      if (video && !isActive) video.pause();
+    });
+
+    videoDots.forEach((dot, dotIndex) => {
+      const isActive = dotIndex === activeVideoIndex;
+      dot.classList.toggle('is-active', isActive);
+      dot.setAttribute('aria-pressed', String(isActive));
+    });
+  };
+
+  if (videoSlides.length > 1) {
+    prevVideoButton?.addEventListener('click', () => renderVideoSlide(activeVideoIndex - 1));
+    nextVideoButton?.addEventListener('click', () => renderVideoSlide(activeVideoIndex + 1));
+
+    videoDots.forEach((dot) => {
+      dot.addEventListener('click', () => renderVideoSlide(Number(dot.dataset.videoDot)));
+    });
+  } else {
+    prevVideoButton?.setAttribute('disabled', 'true');
+    nextVideoButton?.setAttribute('disabled', 'true');
+  }
+
+  renderVideoSlide(0);
+}
+
 const videoModal = document.getElementById('video-modal');
 const videoModalTitle = document.getElementById('video-modal-title');
 const videoModalDescription = document.getElementById('video-modal-description');
@@ -86,6 +171,10 @@ const courseModal = document.getElementById('course-modal');
 const courseModalTitle = document.getElementById('course-modal-title');
 const courseModalDescription = document.getElementById('course-modal-description');
 const courseModalExamples = document.getElementById('course-modal-examples');
+const courseModalImage = document.getElementById('course-modal-image');
+const courseModalMedia = document.getElementById('course-modal-media');
+const courseModalTags = document.getElementById('course-modal-tags');
+const courseModalResult = document.getElementById('course-modal-result');
 const courseModalSignup = document.getElementById('course-modal-signup');
 const courseMoreButtons = document.querySelectorAll('.course-more');
 const courseSignupButtons = document.querySelectorAll('.course-signup');
@@ -96,23 +185,33 @@ const finalCtaSection = document.getElementById('final-cta');
 const courseDetails = {
   'ege-writing': {
     title: 'ЕГЭ без паники (письменная часть)',
+    image: 'public/с1.jpg',
     description:
-      'Практический мини-курс для уверенной письменной части: структура, логика аргументации, критерии и частые ошибки.',
+      'Практический мини-курс для уверенной письменной части: структура, аргументация, критерии и типичные ошибки.',
+    tags: ['Письменная часть', 'Шаблоны', 'Разбор ошибок'],
     examples: [
-      'Проверка письма и комментарии по критериям.',
-      'Пошаговый алгоритм для эссе и типовых формулировок.',
-      'Разбор удачных и слабых примеров с доработкой.',
+      'Пошаговый алгоритм письма и эссе без «пустых» фраз.',
+      'Разбор критериев ФИПИ на понятных примерах.',
+      'Переписывание слабых ответов в сильные по шаблону.',
+      'Персональные комментарии к вашим текстам и точкам роста.',
     ],
+    result:
+      'Вы пишете структурно и уверенно, понимаете, за что дают баллы, и перестаёте теряться в письменной части на экзамене.',
   },
   speaking: {
     title: 'Устная часть без страха',
+    image: 'public/с2.jpg',
     description:
-      'Курс для развития уверенной речи: тренируем ответы по структуре, темп, уверенную подачу и реакцию на сложные вопросы.',
+      'Курс для уверенной устной речи: структура ответа, темп, подача и спокойная реакция на сложные вопросы.',
+    tags: ['Устная часть', 'Темп речи', 'Уверенная подача'],
     examples: [
-      'Проверка устных ответов и персональная обратная связь.',
-      'Готовые конструкции и речевые связки для разных тем.',
-      'Практика в формате экзамена с корректировкой стратегии.',
+      'Готовые конструкции для уверенного старта ответа.',
+      'Тренировка тайминга и логики без длинных пауз.',
+      'Практика в формате экзамена с персональной обратной связью.',
+      'Отработка сложных тем, где обычно теряются баллы.',
     ],
+    result:
+      'Вы говорите собранно и спокойно, держите структуру ответа и звучите уверенно даже в стрессовых заданиях.',
   },
 };
 
@@ -180,12 +279,37 @@ function openCourseModal(courseId) {
   courseModalTitle.textContent = details.title;
   courseModalDescription.textContent = details.description;
 
+  if (courseModalImage && courseModalMedia) {
+    if (details.image) {
+      courseModalImage.src = details.image;
+      courseModalImage.alt = details.title;
+      courseModalMedia.hidden = false;
+    } else {
+      courseModalImage.removeAttribute('src');
+      courseModalImage.alt = '';
+      courseModalMedia.hidden = true;
+    }
+  }
+
+  if (courseModalTags) {
+    courseModalTags.innerHTML = '';
+    (details.tags || []).forEach((tag) => {
+      const tagElement = document.createElement('span');
+      tagElement.textContent = tag;
+      courseModalTags.appendChild(tagElement);
+    });
+  }
+
   courseModalExamples.innerHTML = '';
   details.examples.forEach((example) => {
     const li = document.createElement('li');
     li.textContent = example;
     courseModalExamples.appendChild(li);
   });
+
+  if (courseModalResult) {
+    courseModalResult.textContent = details.result || '';
+  }
 
   activeCourseName = details.title;
   courseModal.hidden = false;
@@ -398,6 +522,7 @@ const testFlow = document.getElementById('test-flow');
 const testResultWrap = document.getElementById('test-result-wrap');
 const examCards = document.querySelectorAll('.exam-card');
 const testStart = document.getElementById('test-start');
+const testStartWarning = document.getElementById('test-start-warning');
 const questionTitle = document.getElementById('test-question-title');
 const questionTopic = document.getElementById('test-question-topic');
 const progressText = document.getElementById('test-progress');
@@ -558,14 +683,25 @@ examCards.forEach((card) => {
     examCards.forEach((item) => item.classList.remove('is-active'));
     card.classList.add('is-active');
     testState.exam = card.dataset.exam;
-    testStart.disabled = !testState.exam;
+    if (testStartWarning) {
+      testStartWarning.hidden = true;
+    }
   });
 });
 
 if (testStart) {
   testStart.addEventListener('click', () => {
     const selectedQuestions = testData[testState.exam] || [];
-    if (!selectedQuestions.length) return;
+    if (!selectedQuestions.length) {
+      if (testStartWarning) {
+        testStartWarning.hidden = false;
+      }
+      return;
+    }
+
+    if (testStartWarning) {
+      testStartWarning.hidden = true;
+    }
 
     testState.questions = selectedQuestions;
     testState.answers = Array(selectedQuestions.length).fill(null);
