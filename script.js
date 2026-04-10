@@ -176,6 +176,7 @@ const courseModalMedia = document.getElementById('course-modal-media');
 const courseModalTags = document.getElementById('course-modal-tags');
 const courseModalResult = document.getElementById('course-modal-result');
 const courseModalSignup = document.getElementById('course-modal-signup');
+const courseModalPrice = document.getElementById('course-modal-price');
 const courseMoreButtons = document.querySelectorAll('.course-more');
 const courseSignupButtons = document.querySelectorAll('.course-signup');
 const selectedCourseInput = document.getElementById('selected-course-input');
@@ -197,6 +198,7 @@ const courseDetails = {
     ],
     result:
       'Вы пишете структурно и уверенно, понимаете, за что дают баллы, и перестаёте теряться в письменной части на экзамене.',
+    priceKey: 'course_ege',
   },
   speaking: {
     title: 'Устная часть без страха',
@@ -212,10 +214,104 @@ const courseDetails = {
     ],
     result:
       'Вы говорите собранно и спокойно, держите структуру ответа и звучите уверенно даже в стрессовых заданиях.',
+    priceKey: 'course_speaking',
   },
 };
 
+const PRICE_STORAGE_KEY = 'susie_price_settings_v1';
+const PRICE_CHANNEL_NAME = 'susie_price_channel_v1';
+const DEFAULT_PRICE_MAP = Object.freeze({
+  format_individual: 'от 500 руб / занятие',
+  format_pair: 'от 500 руб / занятие',
+  format_group: 'от 500 руб / занятие',
+  course_ege: '1000 ₽',
+  course_speaking: '1000 ₽',
+});
+const priceElements = Array.from(document.querySelectorAll('[data-price-key]'));
+const priceChannel =
+  typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(PRICE_CHANNEL_NAME) : null;
+
 let activeCourseName = '';
+let activeCourseId = '';
+let currentPriceMap = { ...DEFAULT_PRICE_MAP };
+
+function normalizePriceMap(source) {
+  const normalized = { ...DEFAULT_PRICE_MAP };
+  if (!source || typeof source !== 'object') return normalized;
+
+  Object.keys(DEFAULT_PRICE_MAP).forEach((key) => {
+    const rawValue = source[key];
+    if (typeof rawValue !== 'string') return;
+
+    const cleanValue = rawValue.trim();
+    if (cleanValue) {
+      normalized[key] = cleanValue;
+    }
+  });
+
+  return normalized;
+}
+
+function loadSavedPrices() {
+  try {
+    const raw = window.localStorage.getItem(PRICE_STORAGE_KEY);
+    if (!raw) return { ...DEFAULT_PRICE_MAP };
+    const parsed = JSON.parse(raw);
+    return normalizePriceMap(parsed);
+  } catch {
+    return { ...DEFAULT_PRICE_MAP };
+  }
+}
+
+function getCoursePriceById(courseId) {
+  const details = courseDetails[courseId];
+  if (!details || !details.priceKey) return DEFAULT_PRICE_MAP.course_ege;
+  return currentPriceMap[details.priceKey] || DEFAULT_PRICE_MAP[details.priceKey] || DEFAULT_PRICE_MAP.course_ege;
+}
+
+function applyPriceMap(priceMap) {
+  priceElements.forEach((element) => {
+    const key = element.dataset.priceKey;
+    if (!key) return;
+    if (priceMap[key]) {
+      element.textContent = priceMap[key];
+    }
+  });
+
+  if (courseModalPrice && activeCourseId) {
+    courseModalPrice.textContent = getCoursePriceById(activeCourseId);
+  }
+}
+
+function syncPriceMap(incomingMap) {
+  currentPriceMap = normalizePriceMap(incomingMap);
+  applyPriceMap(currentPriceMap);
+}
+
+syncPriceMap(loadSavedPrices());
+
+window.addEventListener('storage', (event) => {
+  if (event.key !== PRICE_STORAGE_KEY) return;
+  if (!event.newValue) {
+    syncPriceMap(DEFAULT_PRICE_MAP);
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(event.newValue);
+    syncPriceMap(parsed);
+  } catch {
+    syncPriceMap(DEFAULT_PRICE_MAP);
+  }
+});
+
+if (priceChannel) {
+  priceChannel.addEventListener('message', (event) => {
+    const payload = event.data;
+    if (!payload || payload.type !== 'prices:update') return;
+    syncPriceMap(payload.prices);
+  });
+}
 
 function syncModalState() {
   const hasOpenModal =
@@ -267,6 +363,7 @@ function closeCourseModal() {
   if (!courseModal) return;
   courseModal.hidden = true;
   activeCourseName = '';
+  activeCourseId = '';
   syncModalState();
 }
 
@@ -311,7 +408,11 @@ function openCourseModal(courseId) {
     courseModalResult.textContent = details.result || '';
   }
 
+  activeCourseId = courseId;
   activeCourseName = details.title;
+  if (courseModalPrice) {
+    courseModalPrice.textContent = getCoursePriceById(courseId);
+  }
   courseModal.hidden = false;
   syncModalState();
 }

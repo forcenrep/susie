@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ-панель цен | Сюзанна</title>
+  <meta name="description" content="Управление ценами форматов и мини-курсов в реальном времени." />
+  <link rel="stylesheet" href="admin.css?v=20260410-2" />
+</head>
+<body>
+  <section class="admin-login" id="admin-login">
+    <form class="admin-login-card" id="admin-login-form">
+      <p class="admin-kicker">Доступ ограничен</p>
+      <h1>Вход в админ-панель</h1>
+      <p class="admin-subtitle">Введите пароль для управления ценами на сайте.</p>
+      <label class="admin-field">
+        <span>Пароль</span>
+        <input type="password" id="admin-password" autocomplete="current-password" required />
+      </label>
+      <button class="btn btn-primary" type="submit">Войти</button>
+      <p class="admin-login-error" id="admin-login-error" hidden>Неверный пароль</p>
+    </form>
+  </section>
+
+  <main class="admin-wrap" id="admin-panel" hidden>
+    <header class="admin-head">
+      <p class="admin-kicker">Панель управления</p>
+      <h1>Цены на сайте</h1>
+      <p class="admin-subtitle">
+        Измените нужные значения и нажмите «Сохранить». Откройте сайт в соседней вкладке, чтобы увидеть результат.
+      </p>
+      <a class="admin-open-site" href="./index.html" target="_blank" rel="noopener noreferrer">Открыть сайт</a>
+    </header>
+
+    <section class="admin-grid">
+      <article class="admin-card">
+        <h2>Форматы занятий</h2>
+        <label class="admin-field">
+          <span>Индивидуальные занятия</span>
+          <input type="text" data-price-field="format_individual" />
+        </label>
+        <label class="admin-field">
+          <span>Парные занятия</span>
+          <input type="text" data-price-field="format_pair" />
+        </label>
+        <label class="admin-field">
+          <span>Мини-группы</span>
+          <input type="text" data-price-field="format_group" />
+        </label>
+      </article>
+
+      <article class="admin-card">
+        <h2>Мини-курсы</h2>
+        <label class="admin-field">
+          <span>ЕГЭ без паники</span>
+          <input type="text" data-price-field="course_ege" />
+        </label>
+        <label class="admin-field">
+          <span>Устная часть без страха</span>
+          <input type="text" data-price-field="course_speaking" />
+        </label>
+      </article>
+    </section>
+
+    <section class="admin-actions">
+      <div class="admin-actions-buttons">
+        <button class="btn btn-primary" id="save-prices" type="button">Сохранить</button>
+        <button class="btn btn-reset" id="reset-defaults" type="button">Сбросить цены</button>
+      </div>
+      <p class="admin-status" id="admin-status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>

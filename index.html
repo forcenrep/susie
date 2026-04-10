@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Премиальная подготовка по английскому онлайн</title>
   <meta name="description" content="Подготовка к ОГЭ, ЕГЭ и Международным экзаменам с измеримым результатом: стратегия, алгоритмы заданий и уверенность на экзамене." />
-  <link rel="stylesheet" href="styles.css?v=20260409-35" />
+  <link rel="stylesheet" href="styles.css?v=20260410-2" />
 </head>
 <body>
   <div class="site-wrap">
@@ -533,6 +533,20 @@
                   </div>
                 </fieldset>
 
+                <fieldset class="consent-set">
+                  <legend>Согласие на обработку данных</legend>
+                  <label class="consent-item">
+                    <input type="checkbox" name="test_policy_pdn" required />
+                    <span class="consent-box" aria-hidden="true"></span>
+                    <span class="consent-text">Согласен(а) с <a href="policy-pdn.html" target="_blank" rel="noopener noreferrer">политикой обработки ПДн</a></span>
+                  </label>
+                  <label class="consent-item">
+                    <input type="checkbox" name="test_policy_privacy" required />
+                    <span class="consent-box" aria-hidden="true"></span>
+                    <span class="consent-text">Ознакомлен(а) с <a href="policy-privacy.html" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a></span>
+                  </label>
+                </fieldset>
+
                 <button class="btn btn-primary" type="submit">Записаться на пробное занятие</button>
               </form>
             </div>
@@ -567,6 +581,7 @@
               </div>
               <h3>Индивидуальные занятия</h3>
               <p>Максимальный фокус на вашей цели, темпе и слабых местах.</p>
+              <p class="format-price" data-price-key="format_individual">от 500 руб / занятие</p>
               <div class="format-media">
                 <img src="public/solo.png" alt="Индивидуальные занятия" loading="lazy" />
               </div>
@@ -578,6 +593,7 @@
               </div>
               <h3>Парные занятия</h3>
               <p>Совместная работа в комфортном темпе с взаимной практикой.</p>
+              <p class="format-price" data-price-key="format_pair">от 500 руб / занятие</p>
               <div class="format-media">
                 <img src="public/para.jpg" alt="Парные занятия" loading="lazy" />
               </div>
@@ -589,6 +605,7 @@
               </div>
               <h3>Мини-группы</h3>
               <p>Динамичный формат с практикой, мотивацией и поддержкой группы.</p>
+              <p class="format-price" data-price-key="format_group">от 500 руб / занятие</p>
               <div class="format-media">
                 <img src="public/group.png" alt="Мини-группы" loading="lazy" />
               </div>
@@ -611,7 +628,7 @@
               <h3>ЕГЭ без паники (письменная часть)</h3>
               <p>Короткий практический курс с чётким алгоритмом выполнения письменной части.</p>
               <div class="course-footer">
-                <p class="course-price">1000 ₽</p>
+                <p class="course-price" data-price-key="course_ege">1000 ₽</p>
                 <div class="course-actions">
                   <button class="btn btn-ghost course-more" type="button" data-course-id="ege-writing">Подробнее</button>
                   <button class="btn btn-primary course-signup" type="button" data-course="ЕГЭ без паники (письменная часть)">Записаться</button>
@@ -626,7 +643,7 @@
               <h3>Устная часть без страха</h3>
               <p>Практика уверенной речи с готовыми конструкциями и персональной обратной связью.</p>
               <div class="course-footer">
-                <p class="course-price">1000 ₽</p>
+                <p class="course-price" data-price-key="course_speaking">1000 ₽</p>
                 <div class="course-actions">
                   <button class="btn btn-ghost course-more" type="button" data-course-id="speaking">Подробнее</button>
                   <button class="btn btn-primary course-signup" type="button" data-course="Устная часть без страха">Записаться</button>
@@ -716,12 +733,56 @@
                 </div>
               </fieldset>
 
+              <fieldset class="consent-set">
+                <legend>Согласие на обработку данных</legend>
+                <label class="consent-item">
+                  <input type="checkbox" name="final_policy_pdn" required />
+                  <span class="consent-box" aria-hidden="true"></span>
+                  <span class="consent-text">Согласен(а) с <a href="policy-pdn.html" target="_blank" rel="noopener noreferrer">политикой обработки ПДн</a></span>
+                </label>
+                <label class="consent-item">
+                  <input type="checkbox" name="final_policy_privacy" required />
+                  <span class="consent-box" aria-hidden="true"></span>
+                  <span class="consent-text">Ознакомлен(а) с <a href="policy-privacy.html" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a></span>
+                </label>
+              </fieldset>
+
               <button class="btn btn-primary" type="submit">Отправить заявку</button>
             </form>
           </article>
         </div>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer-grid">
+        <div class="footer-company">
+          <p>ИП ФИО преподавателя</p>
+          <p>ИНН: 000000000000</p>
+        </div>
+
+        <div class="footer-contacts">
+          <a href="tel:+70000000000">+7 (000) 000-00-00</a>
+          <a href="mailto:teacher@example.com">teacher@example.com</a>
+        </div>
+
+        <div class="footer-links">
+          <a class="footer-btn footer-btn--telegram" href="https://t.me/" target="_blank" rel="noopener noreferrer">
+            <span class="footer-btn-icon" aria-hidden="true">✈</span>
+            <span>Telegram</span>
+          </a>
+          <a class="footer-btn footer-btn--max" href="https://max.ru/" target="_blank" rel="noopener noreferrer">
+            <span class="footer-btn-icon" aria-hidden="true">M</span>
+            <span>MAX</span>
+          </a>
+        </div>
+
+        <div class="footer-policies">
+          <a href="policy-pdn.html" target="_blank" rel="noopener noreferrer">Политика обработки ПДн</a>
+          <a href="policy-privacy.html" target="_blank" rel="noopener noreferrer">Политика конфиденциальности</a>
+        </div>
+      </div>
+    </footer>
   </div>
 
   <div class="video-modal" id="video-modal" hidden>
@@ -755,7 +816,7 @@
         <p id="course-modal-result"></p>
       </section>
       <div class="course-modal-actions">
-        <p class="course-price">1000 ₽</p>
+        <p class="course-price" id="course-modal-price">1000 ₽</p>
         <button class="btn btn-primary" id="course-modal-signup" type="button">Записаться</button>
       </div>
     </article>
@@ -764,4 +825,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
