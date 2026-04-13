@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Админ-панель цен | Сюзанна</title>
   <meta name="description" content="Управление ценами форматов и мини-курсов в реальном времени." />
-  <link rel="stylesheet" href="admin.css?v=20260410-2" />
+  <link rel="stylesheet" href="admin.css?v=20260413-1" />
 </head>
 <body>
   <section class="admin-login" id="admin-login">
@@ -71,6 +71,17 @@
     </section>
   </main>
 
-  <script src="admin.js"></script>
+  <div class="save-success" id="save-success" hidden aria-hidden="true">
+    <div class="save-success-card" role="status" aria-live="polite" aria-atomic="true">
+      <div class="save-success-icon" aria-hidden="true">
+        <svg viewBox="0 0 52 52" focusable="false" aria-hidden="true">
+          <path class="save-success-check" d="M14 27.5l8.5 8.5L38.5 19.5" />
+        </svg>
+      </div>
+      <p>Цены сохранены</p>
+    </div>
+  </div>
+
+  <script src="admin.js?v=20260413-1"></script>
 </body>
 </html>

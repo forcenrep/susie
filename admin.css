@@ -194,6 +194,98 @@ h2 {
   font-weight: 600;
 }
 
+.save-success {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.save-success-card {
+  min-width: min(320px, calc(100% - 2rem));
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 1rem 1.2rem;
+  border-radius: 22px;
+  border: 1px solid rgba(33, 150, 74, 0.34);
+  background: linear-gradient(180deg, #f8fff9, #eefcf1);
+  box-shadow: 0 20px 50px rgba(16, 91, 43, 0.2);
+  opacity: 0;
+  transform: translateY(12px) scale(0.94);
+}
+
+.save-success.is-visible .save-success-card {
+  animation: save-success-pop 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.save-success-icon {
+  width: 82px;
+  height: 82px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.54), transparent 48%),
+    linear-gradient(180deg, #46d973, #23b257);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
+    0 14px 28px rgba(22, 139, 65, 0.36);
+}
+
+.save-success-icon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.save-success-check {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+}
+
+.save-success.is-visible .save-success-check {
+  animation: save-success-check 0.5s ease-out 0.2s forwards;
+}
+
+.save-success p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #146436;
+}
+
+@keyframes save-success-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes save-success-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
 @media (max-width: 860px) {
   .admin-wrap {
     width: min(980px, calc(100% - 1.2rem));

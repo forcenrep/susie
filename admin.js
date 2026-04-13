@@ -22,6 +22,8 @@ const fields = Array.from(document.querySelectorAll('[data-price-field]'));
 const saveButton = document.getElementById('save-prices');
 const resetButton = document.getElementById('reset-defaults');
 const statusNode = document.getElementById('admin-status');
+let saveSuccessNode = document.getElementById('save-success');
+let saveSuccessTimer = 0;
 
 const priceChannel =
   typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(PRICE_CHANNEL_NAME) : null;
@@ -109,6 +111,48 @@ function updateStatus(message) {
   statusNode.textContent = `${message} (${time})`;
 }
 
+function ensureSaveSuccessNode() {
+  if (saveSuccessNode) return saveSuccessNode;
+
+  const node = document.createElement('div');
+  node.className = 'save-success';
+  node.id = 'save-success';
+  node.hidden = true;
+  node.setAttribute('aria-hidden', 'true');
+  node.innerHTML = `
+    <div class="save-success-card" role="status" aria-live="polite" aria-atomic="true">
+      <div class="save-success-icon" aria-hidden="true">
+        <svg viewBox="0 0 52 52" focusable="false" aria-hidden="true">
+          <path class="save-success-check" d="M14 27.5l8.5 8.5L38.5 19.5"></path>
+        </svg>
+      </div>
+      <p>Цены сохранены</p>
+    </div>
+  `;
+
+  document.body.appendChild(node);
+  saveSuccessNode = node;
+  return saveSuccessNode;
+}
+
+function showSaveSuccess() {
+  const successNode = ensureSaveSuccessNode();
+  if (!successNode) return;
+
+  window.clearTimeout(saveSuccessTimer);
+  successNode.hidden = false;
+  successNode.setAttribute('aria-hidden', 'false');
+  successNode.classList.remove('is-visible');
+  void successNode.offsetWidth;
+  successNode.classList.add('is-visible');
+
+  saveSuccessTimer = window.setTimeout(() => {
+    successNode.classList.remove('is-visible');
+    successNode.hidden = true;
+    successNode.setAttribute('aria-hidden', 'true');
+  }, 3000);
+}
+
 function publishPrices(priceMap, statusMessage = 'Цены сохранены') {
   const normalized = normalizePriceMap(priceMap);
 
@@ -175,6 +219,7 @@ fields.forEach((field) => {
 if (saveButton) {
   saveButton.addEventListener('click', () => {
     publishPrices(collectFromFields(), 'Цены сохранены');
+    showSaveSuccess();
   });
 }
 
