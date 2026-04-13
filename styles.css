@@ -61,7 +61,6 @@
   --container: min(1160px, calc(100% - 3rem));
   --shadow-soft: 0 16px 50px rgba(9, 17, 33, 0.08);
   --shadow-card: 0 10px 30px rgba(12, 21, 39, 0.08);
-  --header-height: 74px;
 }
 
 * {
@@ -173,16 +172,12 @@ p {
     linear-gradient(124deg, rgba(6, 28, 70, 0.58), rgba(8, 38, 86, 0.34)),
     url("public/фонone.jpg") center/cover no-repeat;
   color: #fff;
-  padding-top: var(--header-height);
   padding-bottom: 2.4rem;
 }
 
 .site-header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
   z-index: 35;
   backdrop-filter: blur(9px);
   background: rgba(8, 27, 66, 0.36);
@@ -190,14 +185,10 @@ p {
 }
 
 .nav-shell {
-  min-height: var(--header-height);
+  min-height: 74px;
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-
-section[id] {
-  scroll-margin-top: calc(var(--header-height) + 12px);
 }
 
 .brand {
@@ -2017,6 +2008,44 @@ body.modal-open {
   color: var(--text-muted);
 }
 
+.legal-doc {
+  max-width: 920px;
+  margin: 0 auto;
+  gap: 0.9rem;
+}
+
+.legal-doc h1 {
+  font-size: clamp(1.6rem, 3.8vw, 2.45rem);
+}
+
+.legal-doc h2 {
+  margin-top: 0.45rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+}
+
+.legal-meta {
+  font-size: 0.9rem;
+  color: rgba(16, 25, 42, 0.68);
+}
+
+.legal-doc p,
+.legal-doc li {
+  line-height: 1.55;
+}
+
+.legal-doc ul,
+.legal-doc ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.legal-doc a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .site-footer {
   padding: 0 0 2rem;
 }
@@ -2094,49 +2123,37 @@ body.modal-open {
 }
 
 .footer-btn--telegram {
-  border-color: #1f95cc;
-  background: linear-gradient(180deg, #2aabee 0%, #229ed9 100%);
+  border-color: rgba(42, 171, 238, 0.52);
+  background: linear-gradient(180deg, #2cb2f1, #2098d8);
   color: #fff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    0 10px 22px rgba(34, 158, 217, 0.34);
+  box-shadow: 0 9px 18px rgba(32, 152, 216, 0.3);
 }
 
 .footer-btn--telegram .footer-btn-icon {
-  color: #229ed9;
-  background: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  font-size: 0.76rem;
-  transform: translateX(0.5px);
+  color: #1c8cc7;
 }
 
 .footer-btn--telegram:hover {
-  background: linear-gradient(180deg, #32b2f3 0%, #25a6e4 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 12px 24px rgba(34, 158, 217, 0.4);
+  background: linear-gradient(180deg, #39baf5, #249fde);
+  box-shadow: 0 12px 22px rgba(32, 152, 216, 0.36);
 }
 
 .footer-btn--max {
-  border-color: rgba(96, 119, 255, 0.52);
-  background: linear-gradient(135deg, #6f7dff 0%, #4ea0ff 48%, #32c6ff 100%);
-  color: #f8fbff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 10px 22px rgba(78, 128, 255, 0.34);
+  border-color: rgba(25, 32, 51, 0.58);
+  background: linear-gradient(180deg, #1b2130, #101626);
+  color: #f4f8ff;
+  box-shadow: 0 9px 18px rgba(16, 22, 38, 0.32);
 }
 
 .footer-btn--max .footer-btn-icon {
-  color: #4b80ff;
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.62);
+  color: #9fd0ff;
+  background: rgba(106, 163, 255, 0.18);
+  border: 1px solid rgba(135, 194, 255, 0.36);
 }
 
 .footer-btn--max:hover {
-  background: linear-gradient(135deg, #7a87ff 0%, #59adff 48%, #41cdff 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    0 12px 24px rgba(78, 128, 255, 0.42);
+  background: linear-gradient(180deg, #242c3f, #131a2d);
+  box-shadow: 0 12px 22px rgba(16, 22, 38, 0.4);
 }
 
 .footer-policies {
