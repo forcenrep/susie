@@ -837,6 +837,27 @@ if (nextButton) {
 
 setTestState('intro');
 
+const leadForms = document.querySelectorAll('.lead-form');
+
+function initConsentLockedSubmit(form) {
+  const submitButton = form.querySelector('button[type="submit"]');
+  const consentChecks = form.querySelectorAll('.consent-set input[type="checkbox"]');
+  if (!submitButton || !consentChecks.length) return;
+
+  const syncSubmitState = () => {
+    const allChecked = Array.from(consentChecks).every((checkbox) => checkbox.checked);
+    submitButton.disabled = !allChecked;
+  };
+
+  consentChecks.forEach((checkbox) => {
+    checkbox.addEventListener('change', syncSubmitState);
+  });
+
+  syncSubmitState();
+}
+
+leadForms.forEach((form) => initConsentLockedSubmit(form));
+
 const COOKIE_CONSENT_KEY = 'susie_cookie_consent_v1';
 const cookieBanner = document.getElementById('cookie-banner');
 const cookieAcceptButton = document.getElementById('cookie-accept');

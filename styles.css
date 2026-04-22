@@ -328,6 +328,22 @@ section[id] {
   box-shadow: 0 15px 30px rgba(74, 159, 255, 0.42);
 }
 
+.btn:disabled,
+.btn[disabled] {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.94);
+  background: linear-gradient(180deg, #aeb8c6, #959fb0);
+  opacity: 1;
+}
+
+.btn:disabled:hover,
+.btn[disabled]:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-outline {
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.38);
