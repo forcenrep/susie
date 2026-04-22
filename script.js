@@ -836,3 +836,35 @@ if (nextButton) {
 }
 
 setTestState('intro');
+
+const COOKIE_CONSENT_KEY = 'susie_cookie_consent_v1';
+const cookieBanner = document.getElementById('cookie-banner');
+const cookieAcceptButton = document.getElementById('cookie-accept');
+
+function hasCookieConsent() {
+  try {
+    return window.localStorage.getItem(COOKIE_CONSENT_KEY) === 'accepted';
+  } catch {
+    return false;
+  }
+}
+
+function hideCookieBanner() {
+  if (!cookieBanner) return;
+  cookieBanner.hidden = true;
+}
+
+if (cookieBanner) {
+  cookieBanner.hidden = hasCookieConsent();
+}
+
+if (cookieAcceptButton) {
+  cookieAcceptButton.addEventListener('click', () => {
+    try {
+      window.localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
+    } catch {
+      // localStorage may be unavailable in restrictive browser modes.
+    }
+    hideCookieBanner();
+  });
+}

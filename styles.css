@@ -1721,7 +1721,8 @@ body.modal-open {
 }
 
 .consent-text a {
-  color: #1f4f94;
+  color: #1c5fd4;
+  font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -2068,6 +2069,35 @@ body.modal-open {
   text-underline-offset: 2px;
 }
 
+.cookie-banner {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(440px, calc(100% - 2rem));
+  z-index: 70;
+  border-radius: 16px;
+  border: 1px solid rgba(74, 159, 255, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 249, 255, 0.96)),
+    #fff;
+  box-shadow: 0 18px 36px rgba(10, 25, 50, 0.18);
+  padding: 0.9rem 0.95rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.cookie-banner p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.cookie-banner-btn {
+  min-width: 110px;
+  justify-self: end;
+}
+
 .site-footer {
   padding: 0 0 2rem;
 }
@@ -2270,6 +2300,12 @@ body.modal-open {
 
   .footer-policies {
     grid-template-columns: 1fr;
+  }
+
+  .cookie-banner {
+    right: 0.7rem;
+    bottom: 0.7rem;
+    width: min(460px, calc(100% - 1.4rem));
   }
 }
 
@@ -2673,5 +2709,19 @@ body.modal-open {
   .consent-box::after {
     left: 5px;
     top: 1px;
+  }
+
+  .cookie-banner {
+    left: 0.7rem;
+    right: 0.7rem;
+    bottom: 0.7rem;
+    width: auto;
+    border-radius: 14px;
+    padding: 0.82rem;
+  }
+
+  .cookie-banner-btn {
+    width: 100%;
+    justify-self: stretch;
   }
 }

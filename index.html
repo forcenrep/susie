@@ -533,16 +533,16 @@
                 </fieldset>
 
                 <fieldset class="consent-set">
-                  <legend>Согласие на обработку данных</legend>
+                  <legend>Согласия</legend>
                   <label class="consent-item">
                     <input type="checkbox" name="test_consent_pdn" required />
                     <span class="consent-box" aria-hidden="true"></span>
-                    <span class="consent-text">Даю <a href="consent-pdn.html" target="_blank" rel="noopener noreferrer">согласие на обработку ПДн</a></span>
+                    <span class="consent-text">Даю согласие на <a href="policy-pdn.html" target="_blank" rel="noopener noreferrer">обработку персональных данных</a></span>
                   </label>
                   <label class="consent-item">
-                    <input type="checkbox" name="test_policy_privacy" required />
+                    <input type="checkbox" name="test_consent_newsletter" />
                     <span class="consent-box" aria-hidden="true"></span>
-                    <span class="consent-text">Ознакомлен(а) с <a href="policy-privacy.html" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a></span>
+                    <span class="consent-text">Даю согласие на получение <a href="consent-newsletter.html" target="_blank" rel="noopener noreferrer">информационной рассылки</a></span>
                   </label>
                 </fieldset>
 
@@ -733,16 +733,16 @@
               </fieldset>
 
               <fieldset class="consent-set">
-                <legend>Согласие на обработку данных</legend>
+                <legend>Согласия</legend>
                 <label class="consent-item">
                   <input type="checkbox" name="final_consent_pdn" required />
                   <span class="consent-box" aria-hidden="true"></span>
-                  <span class="consent-text">Даю <a href="consent-pdn.html" target="_blank" rel="noopener noreferrer">согласие на обработку ПДн</a></span>
+                  <span class="consent-text">Даю согласие на <a href="policy-pdn.html" target="_blank" rel="noopener noreferrer">обработку персональных данных</a></span>
                 </label>
                 <label class="consent-item">
-                  <input type="checkbox" name="final_policy_privacy" required />
+                  <input type="checkbox" name="final_consent_newsletter" />
                   <span class="consent-box" aria-hidden="true"></span>
-                  <span class="consent-text">Ознакомлен(а) с <a href="policy-privacy.html" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a></span>
+                  <span class="consent-text">Даю согласие на получение <a href="consent-newsletter.html" target="_blank" rel="noopener noreferrer">информационной рассылки</a></span>
                 </label>
               </fieldset>
 
@@ -758,6 +758,7 @@
         <div class="footer-company">
           <p>ИП Карапетян Сусанна Карапетовна</p>
           <p>ИНН: 237206114288</p>
+          <p>ОГРНИП: 325237500022707</p>
         </div>
 
         <div class="footer-contacts">
@@ -776,8 +777,9 @@
         </div>
 
         <div class="footer-policies">
-          <a href="consent-pdn.html" target="_blank" rel="noopener noreferrer">Согласие на обработку ПДн</a>
           <a href="policy-pdn.html" target="_blank" rel="noopener noreferrer">Политика обработки ПДн</a>
+          <a href="consent-pdn.html" target="_blank" rel="noopener noreferrer">Согласие на обработку ПДн</a>
+          <a href="consent-newsletter.html" target="_blank" rel="noopener noreferrer">Согласие на рассылку</a>
           <a href="policy-privacy.html" target="_blank" rel="noopener noreferrer">Политика конфиденциальности</a>
         </div>
       </div>
@@ -820,6 +822,14 @@
       </div>
     </article>
   </div>
+
+  <aside class="cookie-banner" id="cookie-banner" hidden role="dialog" aria-live="polite" aria-label="Уведомление о cookie">
+    <p>
+      Сайт собирает cookie-файлы. Продолжая пользоваться сайтом, вы даете согласие на их сбор и обработку.
+      В случае несогласия, вы можете отключить данную функцию в настройках вашего браузера или покинуть сайт.
+    </p>
+    <button class="btn btn-primary cookie-banner-btn" id="cookie-accept" type="button">ОК</button>
+  </aside>
 
   <script src="script.js"></script>
 </body>
