@@ -182,6 +182,8 @@ const courseSignupButtons = document.querySelectorAll('.course-signup');
 const selectedCourseInput = document.getElementById('selected-course-input');
 const selectedCourseNote = document.getElementById('selected-course-note');
 const finalCtaSection = document.getElementById('final-cta');
+const testLeadForm = document.querySelector('.lead-form--test');
+const finalLeadForm = document.getElementById('final-lead-form');
 
 const courseDetails = {
   'ege-writing': {
@@ -836,7 +838,6 @@ if (nextButton) {
 }
 
 setTestState('intro');
-
 const leadForms = document.querySelectorAll('.lead-form');
 
 function initConsentLockedSubmit(form) {
@@ -887,5 +888,113 @@ if (cookieAcceptButton) {
       // localStorage may be unavailable in restrictive browser modes.
     }
     hideCookieBanner();
+  });
+}
+
+const LEAD_API_ENDPOINT = '/api/submit-lead';
+
+function getOrCreateFormStatus(form) {
+  let status = form.querySelector('.form-submit-status');
+  if (status) return status;
+
+  status = document.createElement('p');
+  status.className = 'form-submit-status';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  status.hidden = true;
+  form.appendChild(status);
+  return status;
+}
+
+function setFormStatus(form, type, message) {
+  const status = getOrCreateFormStatus(form);
+  status.classList.remove('is-success', 'is-error', 'is-pending');
+  status.classList.add(`is-${type}`);
+  status.textContent = message;
+  status.hidden = false;
+}
+
+function clearFormStatus(form) {
+  const status = form.querySelector('.form-submit-status');
+  if (!status) return;
+  status.hidden = true;
+  status.textContent = '';
+  status.classList.remove('is-success', 'is-error', 'is-pending');
+}
+
+function setFormBusy(form, isBusy) {
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = isBusy;
+    submitButton.setAttribute('aria-busy', String(isBusy));
+  }
+}
+
+function getTestFormPayload(form) {
+  const formData = new FormData(form);
+  return {
+    // This marks that submission came from the post-test form with discount.
+    formType: 'test',
+    name: (formData.get('name') || '').toString().trim(),
+    phone: (formData.get('phone') || '').toString().trim(),
+    exam: (formData.get('exam') || '').toString().trim(),
+  };
+}
+
+function getFinalFormPayload(form) {
+  const formData = new FormData(form);
+  return {
+    // This marks that submission came from the main final CTA form.
+    formType: 'final',
+    name: (formData.get('final_name') || '').toString().trim(),
+    phone: (formData.get('final_phone') || '').toString().trim(),
+    exam: (formData.get('final_exam') || '').toString().trim(),
+    course: (formData.get('course') || '').toString().trim(),
+  };
+}
+
+async function submitLeadForm(form, payloadBuilder) {
+  clearFormStatus(form);
+  setFormBusy(form, true);
+  setFormStatus(form, 'pending', 'Отправляем заявку...');
+
+  try {
+    const payload = payloadBuilder(form);
+    const response = await fetch(LEAD_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.ok) {
+      const fallbackMessage = 'Не удалось отправить заявку. Попробуйте еще раз чуть позже.';
+      setFormStatus(form, 'error', data.message || fallbackMessage);
+      return;
+    }
+
+    setFormStatus(form, 'success', data.message || 'Заявка отправлена. Скоро свяжемся с вами.');
+    form.reset();
+  } catch (error) {
+    console.error('[lead-form] submit failed', { error });
+    setFormStatus(form, 'error', 'Сервис временно недоступен. Попробуйте еще раз чуть позже.');
+  } finally {
+    setFormBusy(form, false);
+  }
+}
+
+if (testLeadForm) {
+  testLeadForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitLeadForm(testLeadForm, getTestFormPayload);
+  });
+}
+
+if (finalLeadForm) {
+  finalLeadForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitLeadForm(finalLeadForm, getFinalFormPayload);
   });
 }
