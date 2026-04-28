@@ -968,14 +968,26 @@ async function submitLeadForm(form, payloadBuilder) {
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json().catch(() => ({}));
+    const contentType = response.headers.get('content-type') || '';
+    const isJsonResponse = contentType.includes('application/json');
+    const data = isJsonResponse ? await response.json().catch(() => ({})) : {};
+    const backendMessage = data.message || data.error || '';
+
     if (!response.ok || !data.ok) {
       const fallbackMessage = 'Не удалось отправить заявку. Попробуйте еще раз чуть позже.';
-      setFormStatus(form, 'error', data.message || fallbackMessage);
+      if (!isJsonResponse) {
+        console.error('[lead-form] non-json api response', {
+          status: response.status,
+          contentType,
+          endpoint: LEAD_API_ENDPOINT,
+        });
+      }
+
+      setFormStatus(form, 'error', backendMessage || fallbackMessage);
       return;
     }
 
-    setFormStatus(form, 'success', data.message || 'Заявка отправлена. Скоро свяжемся с вами.');
+    setFormStatus(form, 'success', backendMessage || 'Заявка отправлена. Скоро свяжемся с вами.');
     form.reset();
   } catch (error) {
     console.error('[lead-form] submit failed', { error });
