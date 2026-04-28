@@ -11,7 +11,7 @@
   }
 
   try {
-    const body = parseBody(req.body);
+    const body = await parseBody(req);
 
     // TELEGRAM_BOT_TOKEN is read only from server env variables.
     const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -105,18 +105,38 @@
   }
 };
 
-function parseBody(rawBody) {
-  if (rawBody == null) return {};
-  if (typeof rawBody === 'object') return rawBody;
-  if (typeof rawBody === 'string') {
-    try {
-      return JSON.parse(rawBody);
-    } catch {
-      throw new Error('Invalid JSON body');
+async function parseBody(req) {
+  const rawBody = req?.body;
+
+  if (rawBody != null) {
+    if (typeof rawBody === 'object' && !Buffer.isBuffer(rawBody)) return rawBody;
+    if (Buffer.isBuffer(rawBody)) {
+      const text = rawBody.toString('utf8');
+      return parseJsonString(text);
     }
+    if (typeof rawBody === 'string') {
+      return parseJsonString(rawBody);
+    }
+
+    return {};
   }
 
-  return {};
+  // Fallback for runtimes where body is only available as a stream.
+  let streamRaw = '';
+  for await (const chunk of req) {
+    streamRaw += chunk;
+  }
+
+  if (!streamRaw.trim()) return {};
+  return parseJsonString(streamRaw);
+}
+
+function parseJsonString(value) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error('Invalid JSON body');
+  }
 }
 
 function normalizeLeadBody(body) {
