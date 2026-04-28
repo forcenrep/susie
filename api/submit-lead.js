@@ -16,13 +16,13 @@
     // TELEGRAM_BOT_TOKEN is read only from server env variables.
     const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
     // TELEGRAM_CHAT_ID is read only from server env variables.
-    const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+    const telegramChatIdRaw = process.env.TELEGRAM_CHAT_ID;
 
-    if (!telegramBotToken || !telegramChatId) {
+    if (!isTelegramEnvConfigured(telegramBotToken, telegramChatIdRaw)) {
       console.error('[lead-api] telegram env is not configured', {
         requestId,
         hasBotToken: Boolean(telegramBotToken),
-        hasChatId: Boolean(telegramChatId),
+        hasChatId: Boolean(telegramChatIdRaw),
       });
 
       return res.status(500).json({
@@ -46,36 +46,62 @@
     // Message text for Telegram is formatted in one place.
     const text = buildTelegramMessage(normalizedLead);
 
-    const telegramResponse = await fetch(
-      `https://api.telegram.org/bot${telegramBotToken}/sendMessage`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: telegramChatId,
-          text,
-          parse_mode: 'HTML',
-          disable_web_page_preview: true,
-        }),
-      }
-    );
+    const chatIds = parseChatIds(telegramChatIdRaw);
+    const sendResults = [];
 
-    const telegramData = await telegramResponse.json().catch(() => null);
+    for (const chatId of chatIds) {
+      const telegramResponse = await fetch(
+        `https://api.telegram.org/bot${telegramBotToken}/sendMessage`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+          }),
+        }
+      );
 
-    if (!telegramResponse.ok || !telegramData?.ok) {
-      console.error('[lead-api] telegram send failed', {
-        requestId,
+      const telegramData = await telegramResponse.json().catch(() => null);
+      sendResults.push({
+        chatId,
+        ok: Boolean(telegramResponse.ok && telegramData?.ok),
         status: telegramResponse.status,
         statusText: telegramResponse.statusText,
         telegramErrorCode: telegramData?.error_code,
         telegramDescription: telegramData?.description,
+      });
+    }
+
+    const hasSuccess = sendResults.some((item) => item.ok);
+    if (!hasSuccess) {
+      console.error('[lead-api] telegram send failed for all chats', {
+        requestId,
         formType: normalizedLead.formType,
+        results: sendResults.map((item) => ({
+          ...item,
+          chatId: maskChatId(item.chatId),
+        })),
       });
 
       return res.status(502).json({
         ok: false,
         code: 'TELEGRAM_SEND_FAILED',
         message: 'Не удалось отправить заявку. Попробуйте еще раз чуть позже.',
+      });
+    }
+
+    const failedResults = sendResults.filter((item) => !item.ok);
+    if (failedResults.length) {
+      console.warn('[lead-api] telegram partial delivery', {
+        requestId,
+        formType: normalizedLead.formType,
+        failed: failedResults.map((item) => ({
+          ...item,
+          chatId: maskChatId(item.chatId),
+        })),
       });
     }
 
@@ -139,6 +165,35 @@ function parseJsonString(value) {
   }
 }
 
+function isTelegramEnvConfigured(botToken, chatId) {
+  const token = safeString(botToken);
+  const chatIds = parseChatIds(chatId);
+
+  if (!token || !chatIds.length) return false;
+
+  // Guard against placeholders from .env.example.
+  if (token.includes('your_') || token.includes('replace_with_')) return false;
+  if (chatIds.some((chat) => chat.includes('your_') || chat.includes('replace_with_'))) return false;
+
+  // Real Telegram bot token contains ":" between numeric id and secret part.
+  if (!token.includes(':')) return false;
+
+  return true;
+}
+
+function parseChatIds(value) {
+  return safeString(value)
+    .split(/[\s,;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function maskChatId(chatId) {
+  const value = safeString(chatId);
+  if (value.length <= 4) return '****';
+  return `***${value.slice(-4)}`;
+}
+
 function normalizeLeadBody(body) {
   return {
     formType: safeString(body.formType),
@@ -156,9 +211,14 @@ function validateLead(lead) {
 
   if (!lead.name) return 'Укажите имя.';
   if (!lead.phone) return 'Укажите номер телефона.';
+  if (!isValidPhoneFormat(lead.phone)) return 'Введите номер в формате +7 (999) 999 99-99.';
   if (!lead.exam) return 'Укажите, какой экзамен сдаете.';
 
   return '';
+}
+
+function isValidPhoneFormat(value) {
+  return /^\+7 \(\d{3}\) \d{3} \d{2}-\d{2}$/.test(String(value || '').trim());
 }
 
 function safeString(value) {
@@ -176,17 +236,19 @@ function escapeHtml(value) {
 
 function buildTelegramMessage(lead) {
   const isTestForm = lead.formType === 'test';
-  const formLabel = isTestForm ? 'Форма после теста' : 'Финальная форма';
-  const hasDiscount = isTestForm ? 'Да, скидка 20%' : 'Нет';
-  const courseLine = lead.course ? `\n<b>Курс:</b> ${escapeHtml(lead.course)}` : '';
+  const formLabel = isTestForm ? 'После теста' : 'Финальная форма';
+  const hasDiscount = isTestForm ? 'Да, 20%' : 'Нет';
+  const courseLine = lead.course ? `\n🎯 <b>Курс:</b> ${escapeHtml(lead.course)}` : '';
 
   return [
-    '<b>Новая заявка с сайта</b>',
+    '🚀 <b>Новая заявка с сайта Susie</b>',
     '',
-    `<b>Форма:</b> ${escapeHtml(formLabel)}`,
-    `<b>Скидка:</b> ${escapeHtml(hasDiscount)}`,
-    `<b>Имя:</b> ${escapeHtml(lead.name)}`,
-    `<b>Телефон:</b> ${escapeHtml(lead.phone)}`,
-    `<b>Экзамен:</b> ${escapeHtml(lead.exam)}${courseLine}`,
+    '━━━━━━━━━━━━━━━',
+    `🧾 <b>Форма:</b> ${escapeHtml(formLabel)}`,
+    `🎁 <b>Скидка:</b> ${escapeHtml(hasDiscount)}`,
+    `👤 <b>Имя:</b> ${escapeHtml(lead.name)}`,
+    `📞 <b>Телефон:</b> ${escapeHtml(lead.phone)}`,
+    `📚 <b>Экзамен:</b> ${escapeHtml(lead.exam)}${courseLine}`,
+    '━━━━━━━━━━━━━━━',
   ].join('\n');
 }
